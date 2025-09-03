@@ -4,13 +4,17 @@ from pypinyin import pinyin, Style
 
 app = Flask(__name__)
 
-# Cấu hình CORS một cách tường minh hơn
-# Cho phép tất cả các nguồn gốc với ký tự đại diện '*'
-# Hoặc bạn có thể chỉ định cụ thể: cors = CORS(app, resources={r"/get_pinyin": {"origins": "https://www.kanunu8.com"}} )
+# Cấu hình CORS một cách tường minh, đây là dòng quan trọng nhất
+# Nó cho phép endpoint /get_pinyin nhận yêu cầu từ BẤT KỲ tên miền nào (*)
 cors = CORS(app, resources={r"/get_pinyin": {"origins": "*"}})
 
-@app.route('/get_pinyin', methods=['POST'])
+@app.route('/get_pinyin', methods=['POST', 'OPTIONS']) # Thêm 'OPTIONS' để xử lý preflight
 def get_pinyin():
+    # Xử lý yêu cầu OPTIONS (preflight)
+    if request.method == 'OPTIONS':
+        return '', 204 # Trả về phản hồi trống cho preflight
+
+    # Xử lý yêu cầu POST
     data = request.json
     if not data or 'text' not in data:
         return jsonify({'error': 'Missing text in request body'}), 400
@@ -21,4 +25,4 @@ def get_pinyin():
 
     return jsonify({'pinyin': pinyin_str})
 
-# Bỏ dòng if __name__ == '__main__': pass đi vì nó không cần thiết khi triển khai với Gunicorn
+# Không cần if __name__ == '__main__': khi triển khai với Gunicorn
