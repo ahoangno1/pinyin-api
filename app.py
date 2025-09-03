@@ -1,7 +1,7 @@
 from flask import Flask, request, jsonify
 from flask_cors import CORS
 from pypinyin import pinyin, Style
-
+#1
 app = Flask(__name__)
 
 # Cấu hình CORS một cách tường minh, đây là dòng quan trọng nhất
